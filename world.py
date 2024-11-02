@@ -31,12 +31,8 @@ class World:
                 elif char == "B":	# for big berries
                     self.berries.add(Berry(x_index, y_index, CHAR_SIZE // 2, is_power_up=True))
                 # for Ghosts's starting position
-                elif char == "s":
-                    self.ghosts.add(Ghost(x_index, y_index, "skyblue"))
                 elif char == "p": 
                     self.ghosts.add(Ghost(x_index, y_index, "pink"))
-                elif char == "o":
-                    self.ghosts.add(Ghost(x_index, y_index, "orange"))
                 elif char == "r":
                     self.ghosts.add(Ghost(x_index, y_index, "red"))
 
