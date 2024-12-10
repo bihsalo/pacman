@@ -33,7 +33,7 @@ class Display:
 
     # add game over message
     def game_over(self):
-        message = self.game_over_font.render(f'GAME OVER!!', True, pygame.Color("chartreuse"))
-        instruction = self.font.render(f'Press "R" to Restart', True, pygame.Color("aqua"))
-        self.screens.blit(message, ((WIDTH // 4), (HEIGHT // 3)))
-        self.screens.blit(instruction, ((WIDTH // 4), (HEIGHT // 2)))
+        message = self.game_over_font.render(f'ИГРА ОКОНЧЕНА!', True, pygame.Color("chartreuse"))
+        instruction = self.font.render(f'поставьте 10 для рестарта', True, pygame.Color("chartreuse"))
+        self.screens.blit(message, ((WIDTH // 5.65), (HEIGHT // 3)))
+        self.screens.blit(instruction, ((WIDTH // 3.76), (HEIGHT // 2)))

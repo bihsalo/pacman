@@ -1,7 +1,6 @@
 import pygame
 from settings import CHAR_SIZE, PLAYER_SPEED
 from animation import import_sprite
-
 class Pac(pygame.sprite.Sprite):
     def __init__(self, row, col):
         super().__init__()
@@ -27,7 +26,7 @@ class Pac(pygame.sprite.Sprite):
 
     # gets all the image needed for animating specific player action
     def _import_character_assets(self):
-        character_path = "assets/pac/"
+        character_path = "assets/anime/"
         self.animations = {
             "up": [],
             "down": [],
@@ -52,9 +51,30 @@ class Pac(pygame.sprite.Sprite):
 
     # update with sprite/sheets
     def animate(self, pressed_key, walls_collide_list):
+
+        animation = self.animations.get(self.status, [])
+
+        # Проверяем, есть ли анимация для текущего состояния
+        if not animation:
+            print(f"No frames found for '{self.status}' animation.")  # Логируем проблему
+            return
+
+        # Анимация продолжается только если есть кадры
+        self.frame_index += self.animation_speed
+        if self.frame_index >= len(animation):
+            self.frame_index = 0
+
+        # Безопасный доступ к элементам списка
+        image = animation[int(self.frame_index)]
+        self.image = pygame.transform.scale(image, (CHAR_SIZE, CHAR_SIZE))
+
         animation = self.animations[self.status]
         # loop over frame index
         self.frame_index += self.animation_speed
+        if self.frame_index >= len(animation):
+            self.frame_index = 0  # Сбрасываем индекс на 0, чтобы не выйти за границы списка
+
+        image = animation[int(self.frame_index)]
         if self.frame_index >= len(animation):
             self.frame_index = 0
         image = animation[int(self.frame_index)]

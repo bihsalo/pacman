@@ -34,12 +34,8 @@ class World:
                 elif char == "B":  # for big berries
                     self.berries.add(Berry(x_index, y_index, CHAR_SIZE // 2, is_power_up=True))
                 # for Ghosts's starting position
-                elif char == "s":
-                    self.ghosts.add(Ghost(x_index, y_index, "skyblue"))
                 elif char == "p":
                     self.ghosts.add(Ghost(x_index, y_index, "pink"))
-                elif char == "o":
-                    self.ghosts.add(Ghost(x_index, y_index, "orange"))
                 elif char == "r":
                     self.ghosts.add(Ghost(x_index, y_index, "red"))
 
@@ -97,7 +93,13 @@ class World:
         if not self.game_over:
             # player movement
             pressed_key = pygame.key.get_pressed()
-            self.player.sprite.animate(pressed_key, self.walls_collide_list)
+
+            # Добавляем проверку на существование player.sprite
+            if self.player.sprite:
+                self.player.sprite.animate(pressed_key, self.walls_collide_list)
+            else:
+                print("Player sprite not initialized!")
+
             # teleporting to the other side of the map
             if self.player.sprite.rect.right <= 0:
                 self.player.sprite.rect.x = WIDTH
@@ -146,3 +148,23 @@ class World:
             if pressed_key[pygame.K_r]:
                 self.game_over = False
                 self.restart_level()
+
+def animate(self, pressed_key, walls_collide_list):
+    animation = self.animations[self.status]
+
+    # Отладочный вывод
+    print(f"Current status: {self.status}")
+    print(f"Animation frames: {len(animation)}")
+    print(f"Frame index: {self.frame_index}")
+
+    if not animation:
+        print(f"No frames found for '{self.status}' animation.")
+        return
+
+    # Анимация продолжается только если есть кадры
+    self.frame_index += self.animation_speed
+    if self.frame_index >= len(animation):
+        self.frame_index = 0
+
+    image = animation[int(self.frame_index)]
+    self.image = pygame.transform.scale(image, (CHAR_SIZE, CHAR_SIZE))

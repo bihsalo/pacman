@@ -4,7 +4,7 @@ from world import World
 
 pygame.init()
 screens = pygame.display.set_mode((WIDTH, HEIGHT + NAV_HEIGHT))
-pygame.display.set_caption("PacMan")
+pygame.display.set_caption("Поставьте зачет")
 
 class Main:
     def __init__(self, screens):
