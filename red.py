@@ -2,9 +2,8 @@ import pygame
 from settings import CHAR_SIZE, PLAYER_SPEED
 from animation import import_sprite
 
-"""Модуль с параметризацией пакмена"""
 
-class Pac(pygame.sprite.Sprite):
+class Red(pygame.sprite.Sprite):
     """
        Класс создающий пакмена
 
@@ -25,17 +24,16 @@ class Pac(pygame.sprite.Sprite):
            direction (tuple): текущее направление пакмена.
            status (str): определение текущего статуса пакмена для анимации.
            life (int): кол-во оставшихся жизней у пакмена.
-           pac_score (int): текущий счет пакмена
+           pac_score (int): Current score of Pac-Man.
        """
-
 
     def __init__(self, row, col):
         """
-        реализация спрайта пакмена
+        Initialize the Pac-Man sprite.
 
         Args:
-            row (int): индексирование строки стартовой позиции пакмена.
-            col (int): индексирование столбца стартовой позиции пакмена.
+            row (int): Row index for Pac-Man's starting position.
+            col (int): Column index for Pac-Man's starting position.
         """
         super().__init__()
         self.abs_x = (row * CHAR_SIZE)
@@ -50,7 +48,7 @@ class Pac(pygame.sprite.Sprite):
         self.immune_time = 0
         self.immune = False
         self.directions = {'left': (-PLAYER_SPEED, 0), 'right': (PLAYER_SPEED, 0), 'up': (0, -PLAYER_SPEED), 'down': (0, PLAYER_SPEED)}
-        self.keys = {'left': pygame.K_LEFT, 'right': pygame.K_RIGHT, 'up': pygame.K_UP, 'down': pygame.K_DOWN}
+        self.keys = {'a': pygame.K_LEFT, 'd': pygame.K_RIGHT, 'w': pygame.K_UP, 's': pygame.K_DOWN}
         self.direction = (0, 0)
         self.status = "idle"
         self.life = 3
@@ -59,9 +57,9 @@ class Pac(pygame.sprite.Sprite):
 
     def _import_character_assets(self):
         """
-                подгрузка и установка файловых ассетов из системной папки.
+                Load and organize Pac-Man's animation assets from the filesystem.
                 """
-        character_path = "assets/anime/"
+        character_path = "assets/anime_red/"
         self.animations = {
             "up": [],
             "down": [],
@@ -87,27 +85,30 @@ class Pac(pygame.sprite.Sprite):
         self.rect.y = self.abs_y
 
 
+    # update with sprite/sheets
     def animate(self, pressed_key, walls_collide_list):
 
         animation = self.animations.get(self.status, [])
-        # проверка на существование кадров анимации.
+
+        # Проверяем, есть ли анимация для текущего состояния
         if not animation:
             print(f"No frames found for '{self.status}' animation.")  # Логируем проблему
             return
 
-        # анимация продолжается только если есть кадры.
+        # Анимация продолжается только если есть кадры
         self.frame_index += self.animation_speed
         if self.frame_index >= len(animation):
             self.frame_index = 0
 
-        # безопасный доступ к элементам списка.
+        # Безопасный доступ к элементам списка
         image = animation[int(self.frame_index)]
         self.image = pygame.transform.scale(image, (CHAR_SIZE, CHAR_SIZE))
 
         animation = self.animations[self.status]
+        # loop over frame index
         self.frame_index += self.animation_speed
         if self.frame_index >= len(animation):
-            self.frame_index = 0
+            self.frame_index = 0  # Сбрасываем индекс на 0, чтобы не выйти за границы списка
 
         image = animation[int(self.frame_index)]
         if self.frame_index >= len(animation):
@@ -128,6 +129,7 @@ class Pac(pygame.sprite.Sprite):
 
 
     def update(self):
+        # Timer based from FPS count
         self.immune = True if self.immune_time > 0 else False
         self.immune_time -= 1 if self.immune_time > 0 else 0
         self.rect = self.image.get_rect(topleft=(self.rect.x, self.rect.y))

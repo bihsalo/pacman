@@ -3,8 +3,40 @@ import random
 import time
 from settings import WIDTH, CHAR_SIZE, GHOST_SPEED
 
+"""Параметризация призраков в игре"""
+
+
 class Ghost(pygame.sprite.Sprite):
+    """
+    Класс призрака.
+
+    Аргументы:
+        abs_x (int): Начальная координата Х.
+        abs_y (int): Начальная координата Y.
+        rect (pygame.Rect): Положение и размеры призрака.
+        move_speed (int): Скорость призрака.
+        color (pygame.Color): Цвет призрака.
+        move_directions (list): Направления движения.
+        moving_dir (str): Текущее направление движения.
+        img_path (str): Путь к папке с изображениями призрака.
+        img_name (str): Имя файла изображения текущего направления движения.
+        image (pygame.Surface): Текущее изображение призрака.
+        mask (pygame.Mask): Маска призрака для проверки столкновений.
+        directions (dict): Словарь с направлениями движения и их смещениями.
+        keys (list): Названия направлений.
+        direction (tuple): Текущее смещение по X и Y.
+    """
+
+
     def __init__(self, row, col, color):
+        """
+        Объект призрака.
+
+        Аргументы:
+            row (int): Начальная строка.
+            col (int): Начальный столбец.
+            color (str): Цвет призрака.
+        """
         super().__init__()
         self.abs_x = (row * CHAR_SIZE)
         self.abs_y = (col * CHAR_SIZE)
@@ -23,30 +55,55 @@ class Ghost(pygame.sprite.Sprite):
         self.keys = ['left', 'right', 'up', 'down']
         self.direction = (0, 0)
 
+
     def move_to_start_pos(self):
+        """
+        Перемещает призрака в начальную позицию.
+        """
         self.rect.x = self.abs_x
         self.rect.y = self.abs_y
 
+
     def is_collide(self, x, y, walls_collide_list):
+        """
+        Проверяет, сталкивается ли призрак с препятствием.
+
+        Аргументы:
+            x (int): Смещение по X.
+            y (int): Смещение по Y.
+            walls_collide_list (list): Список препятствий.
+
+        Возвращает:
+            bool: True - столкновение, иначе False.
+        """
         tmp_rect = self.rect.move(x, y)
         if tmp_rect.collidelist(walls_collide_list) == -1:
             return False
         return True
 
+
     def _animate(self):
+        """
+        Обновляет изображение призрака в соответствии с текущим направлением движения.
+        """
         self.img_name = f'{self.moving_dir}.png'
         self.image = pygame.image.load(self.img_path + self.img_name)
         self.image = pygame.transform.scale(self.image, (CHAR_SIZE, CHAR_SIZE))
         self.rect = self.image.get_rect(topleft=(self.rect.x, self.rect.y))
 
+
     def update(self, walls_collide_list):
-        # ghost movement
+        """
+        Состояние и движение призрака.
+
+        Аргументы:
+            walls_collide_list (list): Список препятствий.
+        """
         available_moves = []
         for key in self.keys:
             if not self.is_collide(*self.directions[key], walls_collide_list):
                 available_moves.append(key)
         randomizing = False if len(available_moves) <= 2 and self.direction != (0, 0) else True
-        # 60% chance of randomizing ghost move
         if randomizing and random.randrange(0, 100) <= 60:
             self.moving_dir = random.choice(available_moves)
             self.direction = self.directions[self.moving_dir]
@@ -54,7 +111,6 @@ class Ghost(pygame.sprite.Sprite):
             self.rect.move_ip(self.direction)
         else:
             self.direction = (0, 0)
-        # teleporting to the other side of the map
         if self.rect.right <= 0:
             self.rect.x = WIDTH
         elif self.rect.left >= WIDTH:

@@ -7,8 +7,36 @@ from berry import Berry
 from ghost import Ghost
 from display import Display
 
+
 class World:
+
+
+    """
+    Отрисовка игрового поля.
+
+    Аргументы:
+        screens (pygame.Surface): Экран.
+        player (pygame.sprite.GroupSingle): Характеристики пакмена.
+        ghosts (pygame.sprite.Group): Характеристики призраков.
+        walls (pygame.sprite.Group): Скелет стен.
+        berries (pygame.sprite.Group): Скелет ягод.
+        display (Display): Интерфейс.
+        game_over (bool): Закончина ли игра.
+        reset_pos (bool): Координаты точек респавна.
+        player_score (int): Счет игрока.
+        game_level (int): Текущий уровень.
+    """
+
+
     def __init__(self, screens):
+
+
+        """
+        Объект игрового поля.
+
+        Аргументы:
+            screens (pygame.Surface): Экран.
+        """
         self.screens = screens
         self.player = pygame.sprite.GroupSingle()
         self.ghosts = pygame.sprite.Group()
@@ -21,39 +49,54 @@ class World:
         self.game_level = 1
         self._generate_world()
 
-        # create and add player to the screens
 
     def _generate_world(self):
-        # renders obstacle from the MAP table
+
+
+        """
+        Начальное состояние игрового поля.
+        Заполняет поле стенами, ягодами, призраками и устанавливает начальную позицию пакмена.
+        """
         for y_index, col in enumerate(MAP):
             for x_index, char in enumerate(col):
-                if char == "1":  # for walls
+                if char == "1":
                     self.walls.add(Cell(x_index, y_index, CHAR_SIZE, CHAR_SIZE))
-                elif char == " ":  # for paths to be filled with berries
+                elif char == " ":
                     self.berries.add(Berry(x_index, y_index, CHAR_SIZE // 4))
-                elif char == "B":  # for big berries
+                elif char == "B":
                     self.berries.add(Berry(x_index, y_index, CHAR_SIZE // 2, is_power_up=True))
-                # for Ghosts's starting position
                 elif char == "p":
                     self.ghosts.add(Ghost(x_index, y_index, "pink"))
                 elif char == "r":
                     self.ghosts.add(Ghost(x_index, y_index, "red"))
 
-                elif char == "P":  # for PacMan's starting position
+                elif char == "P":
                     self.player.add(Pac(x_index, y_index))
 
         self.walls_collide_list = [wall.rect for wall in self.walls.sprites()]
 
+
     def generate_new_level(self):
+
+
+        """
+        Заново заселяет игровое поле ягодами.
+        """
         for y_index, col in enumerate(MAP):
             for x_index, char in enumerate(col):
-                if char == " ":  # for paths to be filled with berries
+                if char == " ":
                     self.berries.add(Berry(x_index, y_index, CHAR_SIZE // 4))
-                elif char == "B":  # for big berries
+                elif char == "B":
                     self.berries.add(Berry(x_index, y_index, CHAR_SIZE // 2, is_power_up=True))
         time.sleep(2)
 
+
     def restart_level(self):
+
+
+        """
+        Перезапускает уровень, сбрасывая все сущности.
+        """
         self.berries.empty()
         [ghost.move_to_start_pos() for ghost in self.ghosts.sprites()]
         self.game_level = 1
@@ -64,9 +107,13 @@ class World:
         self.player.sprite.status = "idle"
         self.generate_new_level()
 
-        # displays nav
 
     def _dashboard(self):
+
+
+        """
+        Отображает игровую панель.
+        """
         nav = pygame.Rect(0, HEIGHT, WIDTH, NAV_HEIGHT)
         pygame.draw.rect(self.screens, pygame.Color("cornsilk4"), nav)
 
@@ -74,11 +121,15 @@ class World:
         self.display.show_level(self.game_level)
         self.display.show_score(self.player.sprite.pac_score)
 
+
     def _check_game_state(self):
-        # checks if game over
+
+
+        """
+        Проверяет текущее состояние игры.
+        """
         if self.player.sprite.life == 0:
             self.game_over = True
-        # generates new level
         if len(self.berries) == 0 and self.player.sprite.life > 0:
             self.game_level += 1
             for ghost in self.ghosts.sprites():
@@ -89,32 +140,34 @@ class World:
             self.player.sprite.status = "idle"
             self.generate_new_level()
 
+
     def update(self):
+
+
+        """
+        Обновляет состояние игры.
+        Условия окончания игры и переходы между уровнями.
+        """
         if not self.game_over:
-            # player movement
             pressed_key = pygame.key.get_pressed()
 
-            # Добавляем проверку на существование player.sprite
             if self.player.sprite:
                 self.player.sprite.animate(pressed_key, self.walls_collide_list)
             else:
-                print("Player sprite not initialized!")
+                print("Пакмен не отрисован")
 
-            # teleporting to the other side of the map
             if self.player.sprite.rect.right <= 0:
                 self.player.sprite.rect.x = WIDTH
             elif self.player.sprite.rect.left >= WIDTH:
                 self.player.sprite.rect.x = 0
-            # PacMan eating-berry effect
             for berry in self.berries.sprites():
                 if self.player.sprite.rect.colliderect(berry.rect):
                     if berry.power_up:
-                        self.player.sprite.immune_time = 150  # Timer based from FPS count
+                        self.player.sprite.immune_time = 150
                         self.player.sprite.pac_score += 50
                     else:
                         self.player.sprite.pac_score += 10
                     berry.kill()
-            # PacMan bumping into ghosts
             for ghost in self.ghosts.sprites():
                 if self.player.sprite.rect.colliderect(ghost.rect):
                     if not self.player.sprite.immune:
@@ -126,7 +179,6 @@ class World:
                         ghost.move_to_start_pos()
                         self.player.sprite.pac_score += 100
         self._check_game_state()
-        # rendering
         [wall.update(self.screens) for wall in self.walls.sprites()]
         [berry.update(self.screens) for berry in self.berries.sprites()]
         [ghost.update(self.walls_collide_list) for ghost in self.ghosts.sprites()]
@@ -135,33 +187,36 @@ class World:
         self.player.draw(self.screens)
         self.display.game_over() if self.game_over else None
         self._dashboard()
-        # reset Pac and Ghosts position after PacMan get captured
         if self.reset_pos and not self.game_over:
             [ghost.move_to_start_pos() for ghost in self.ghosts.sprites()]
             self.player.sprite.move_to_start_pos()
             self.player.sprite.status = "idle"
             self.player.sprite.direction = (0, 0)
             self.reset_pos = False
-        # for restart button
         if self.game_over:
             pressed_key = pygame.key.get_pressed()
             if pressed_key[pygame.K_r]:
                 self.game_over = False
                 self.restart_level()
 
+
 def animate(self, pressed_key, walls_collide_list):
+
+
+    """
+    Анимация игрока от ввода с клавиатуры.
+
+    Аргументы:
+        pressed_key (list): Нажатые клавиши.
+        walls_collide_list (list): Cntys для проверки cтолкновений
+    """
     animation = self.animations[self.status]
 
-    # Отладочный вывод
-    print(f"Current status: {self.status}")
-    print(f"Animation frames: {len(animation)}")
-    print(f"Frame index: {self.frame_index}")
+    print(f"Текуший статус: {self.status}")
 
     if not animation:
-        print(f"No frames found for '{self.status}' animation.")
         return
 
-    # Анимация продолжается только если есть кадры
     self.frame_index += self.animation_speed
     if self.frame_index >= len(animation):
         self.frame_index = 0
