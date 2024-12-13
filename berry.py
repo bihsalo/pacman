@@ -1,7 +1,8 @@
+"""Модуль параметризации "вишенок" в игре"""
+
 import pygame
 from settings import CHAR_SIZE, PLAYER_SPEED
 
-"""Параметризация "вишенок" в игре"""
 
 
 class Berry(pygame.sprite.Sprite):

@@ -1,7 +1,8 @@
+"""Модуль объектной и текстовой составляющей игры"""
+
 import pygame
 from settings import WIDTH, HEIGHT, CHAR_SIZE
 
-"""Объектная и текстовая составляющая игры"""
 
 pygame.font.init()
 

@@ -1,3 +1,5 @@
+"""Модуль параметризации карты и игрового мира"""
+
 import pygame
 import time
 from settings import HEIGHT, WIDTH, NAV_HEIGHT, CHAR_SIZE, MAP, PLAYER_SPEED

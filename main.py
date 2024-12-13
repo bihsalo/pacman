@@ -1,8 +1,8 @@
+"""Основной модуль игры"""
 import pygame, sys
 from settings import WIDTH, HEIGHT, NAV_HEIGHT
 from world import World
 
-"""Основной модуль игры"""
 
 pygame.init()
 screens = pygame.display.set_mode((WIDTH, HEIGHT + NAV_HEIGHT))

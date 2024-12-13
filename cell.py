@@ -1,6 +1,6 @@
-import pygame
-
 """Модуль ячеек на игровом поле и их параметризации"""
+
+import pygame
 
 
 class Cell(pygame.sprite.Sprite):

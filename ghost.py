@@ -1,9 +1,10 @@
+"""Модуль параметризации призраков в игре"""
+
 import pygame
 import random
 import time
 from settings import WIDTH, CHAR_SIZE, GHOST_SPEED
 
-"""Параметризация призраков в игре"""
 
 
 class Ghost(pygame.sprite.Sprite):

@@ -1,8 +1,9 @@
+"""Модуль с параметризацией пакмена"""
+
 import pygame
 from settings import CHAR_SIZE, PLAYER_SPEED
 from animation import import_sprite
 
-"""Модуль с параметризацией пакмена"""
 
 class Pac(pygame.sprite.Sprite):
     """

@@ -1,7 +1,7 @@
+"""Модуль настройки анимаций"""
+
 from os import walk
 import pygame
-
-"""Настройка анимаций"""
 
 
 def import_sprite(path):
